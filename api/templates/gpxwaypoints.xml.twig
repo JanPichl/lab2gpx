@@ -24,8 +24,8 @@
                 <gsak:DNF>false</gsak:DNF>
                 <gsak:FTF>false</gsak:FTF>
                 {% if adventureLab.IsLinear and settings.linear == constant('App\\Model\\Dto\\Linear::CORRECTED') %}
-                    <gsak:LatBeforeCorrect>' . {{ adventureLab.Location.Latitude }} . '</gsak:LatBeforeCorrect>
-                    <gsak:LonBeforeCorrect>' . {{ adventureLab.Location.Longitude }} . '</gsak:LonBeforeCorrect>
+                    <gsak:LatBeforeCorrect>{{ adventureLab.Location.Latitude }}</gsak:LatBeforeCorrect>
+                    <gsak:LonBeforeCorrect>{{ adventureLab.Location.Longitude }}</gsak:LonBeforeCorrect>
                 {% endif %}
             </gsak:wptExtension>
             <groundspeak:cache available="True" archived="False" xmlns:groundspeak="http://www.groundspeak.com/cache/1/0/1">

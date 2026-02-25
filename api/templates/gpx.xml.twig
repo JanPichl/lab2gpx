@@ -35,8 +35,8 @@
                             <gsak:DNF>false</gsak:DNF>
                             <gsak:FTF>false</gsak:FTF>
                             {% if adventureLab.IsLinear and settings.linear == constant('App\\Model\\Dto\\Linear::CORRECTED') %}
-                                <gsak:LatBeforeCorrect>' . {{ wpt.Location.Latitude }} . '</gsak:LatBeforeCorrect>
-                                <gsak:LonBeforeCorrect>' . {{ wpt.Location.Longitude }} . '</gsak:LonBeforeCorrect>
+                                <gsak:LatBeforeCorrect>{{ wpt.Location.Latitude }}</gsak:LatBeforeCorrect>
+                                <gsak:LonBeforeCorrect>{{ wpt.Location.Longitude }}</gsak:LonBeforeCorrect>
                             {% endif %}
                         </gsak:wptExtension>
                         <lab2gpx:adventureLab xmlns:lab2gpx="https://lab2gpx.gcutils.de/ns/lab2gpx/1">
