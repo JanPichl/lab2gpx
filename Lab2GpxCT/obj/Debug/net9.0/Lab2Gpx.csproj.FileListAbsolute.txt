@@ -1,0 +1,14 @@
+D:\GitHome\Tests\Lab2Gpx\bin\Debug\net9.0\Lab2Gpx.exe
+D:\GitHome\Tests\Lab2Gpx\bin\Debug\net9.0\Lab2Gpx.deps.json
+D:\GitHome\Tests\Lab2Gpx\bin\Debug\net9.0\Lab2Gpx.runtimeconfig.json
+D:\GitHome\Tests\Lab2Gpx\bin\Debug\net9.0\Lab2Gpx.dll
+D:\GitHome\Tests\Lab2Gpx\bin\Debug\net9.0\Lab2Gpx.pdb
+D:\GitHome\Tests\Lab2Gpx\obj\Debug\net9.0\Lab2Gpx.GeneratedMSBuildEditorConfig.editorconfig
+D:\GitHome\Tests\Lab2Gpx\obj\Debug\net9.0\Lab2Gpx.AssemblyInfoInputs.cache
+D:\GitHome\Tests\Lab2Gpx\obj\Debug\net9.0\Lab2Gpx.AssemblyInfo.cs
+D:\GitHome\Tests\Lab2Gpx\obj\Debug\net9.0\Lab2Gpx.csproj.CoreCompileInputs.cache
+D:\GitHome\Tests\Lab2Gpx\obj\Debug\net9.0\Lab2Gpx.dll
+D:\GitHome\Tests\Lab2Gpx\obj\Debug\net9.0\refint\Lab2Gpx.dll
+D:\GitHome\Tests\Lab2Gpx\obj\Debug\net9.0\Lab2Gpx.pdb
+D:\GitHome\Tests\Lab2Gpx\obj\Debug\net9.0\Lab2Gpx.genruntimeconfig.cache
+D:\GitHome\Tests\Lab2Gpx\obj\Debug\net9.0\ref\Lab2Gpx.dll

@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<gpx version="1.0" creator="Lab2Gpx C#" xmlns:groundspeak="http://www.groundspeak.com/cache/1/0/1" xmlns="http://www.topografix.com/GPX/1/0">
+  <wpt lat="48.991017" lon="14.465400">
+    <name>AL2BF8456B</name>
+    <desc>Hřiště u Hokejky</desc>
+    <sym>Geocache</sym>
+    <type>Geocache|Lab Cache</type>
+    <groundspeak:cache id="0" available="True" archived="False">
+      <groundspeak:name>Hřiště u Hokejky</groundspeak:name>
+      <groundspeak:placed_by></groundspeak:placed_by>
+      <groundspeak:type>Lab Cache</groundspeak:type>
+      <groundspeak:difficulty>1.0</groundspeak:difficulty>
+      <groundspeak:terrain>1.0</groundspeak:terrain>
+      <groundspeak:short_description html="False">Adventure Lab, 0 zastavek</groundspeak:short_description>
+      <groundspeak:long_description html="False">prozkoumejte oplocené hřiště u Hokejky</groundspeak:long_description>
+    </groundspeak:cache>
+  </wpt>
+</gpx>
