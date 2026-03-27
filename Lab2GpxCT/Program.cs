@@ -2,6 +2,8 @@
 // .NET 8+ Console App, žádné NuGet balíčky nejsou potřeba
 // Použití: dotnet run -- --lat 50.0755 --lon 14.4378 --radius 15000 --output labs.gpx
 
+//https://api.groundspeak.com/api-docs/index
+
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
