@@ -1,9 +1,9 @@
 {
   "userName": "Pichlík",
   "userPassword": "JendaPicha*1980",
-  "latitude": 48.9910231,
-  "longitude": 14.4653933,
-  "radius": 2500,
-  "limit": 3,
+  "latitude": 48.9617500,
+  "longitude": 14.4122167,
+  "radius": 1500,
+  "limit": 100,
   "outputFileName": "labs.gpx"
 }

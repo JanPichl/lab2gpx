@@ -7,7 +7,7 @@ namespace Lab2Gpx
     using System.Text.Json.Serialization;
     using static Lab2Gpx.Models;
 
-    internal static class AdventureHtmlGenerator
+    internal static class HtmlGenerator
     {
 
         /// <summary>
@@ -457,10 +457,10 @@ namespace Lab2Gpx
                 for (int i = 0; i < adventure.StageSummaries.Count; i++)
                 {
                     var s = adventure.StageSummaries[i];
-                    string itemClass = s.IsFinal ? "stage-item final" : s.IsComplete ? "stage-item complete" : "stage-item";
-                    string numClass = s.IsFinal ? "stage-num finale" : s.IsComplete ? "stage-num done" : "stage-num todo";
-                    string numText = s.IsFinal ? "🏁" : (i + 1).ToString();
-                    string checkIcon = s.IsComplete ? "✅" : (s.IsFinal ? "🏆" : "○");
+                    string itemClass = s.IsFinal.GetValueOrDefault() ? "stage-item final" : s.IsComplete.GetValueOrDefault() ? "stage-item complete" : "stage-item";
+                    string numClass = s.IsFinal.GetValueOrDefault() ? "stage-num finale" : s.IsComplete.GetValueOrDefault() ? "stage-num done" : "stage-num todo";
+                    string numText = s.IsFinal.GetValueOrDefault() ? "🏁" : (i + 1).ToString();
+                    string checkIcon = s.IsComplete.GetValueOrDefault() ? "✅" : (s.IsFinal.GetValueOrDefault() ? "🏆" : "○");
 
                     sb.AppendLine($"""    <div class="{itemClass}">""");
                     sb.AppendLine($"""      <div class="{numClass}">{numText}</div>""");

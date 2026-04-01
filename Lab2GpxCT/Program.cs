@@ -4,10 +4,14 @@
 
 //https://api.groundspeak.com/api-docs/index
 //https://api.groundspeak.com/documentation#adventure-stages
+//https://labs-api.geocaching.com/swagger/ui/index#/
+//https://labs-api.geocaching.com/swagger/ui/index#!/Adventures/Adventures_Get
+
 
 namespace Lab2Gpx
 {
     using System.Net.Http.Headers;
+    using System.Net.Http.Json;
     using System.Text;
     using System.Text.Encodings.Web;
     using System.Text.Json;
@@ -29,13 +33,35 @@ namespace Lab2Gpx
 
         internal const string DETAILS_URL = "https://api.groundspeak.com/adventuresmobile/v1/public/adventures/";
 
-        internal static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        internal const string LABS_API_DETAILS_URL = "https://labs-api.geocaching.com/Api/Adventures/";
 
+
+        internal static readonly JsonSerializerOptions SerializerOptionsA = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
+        private static JsonSerializerOptions SerializerOptionsB = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
+        };
+
+        public static string AccesToken { get; set; }
+
+        private static int _step = 0;
+
+        /// <summary>
+        /// Main fce
+        /// 
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         private static async Task<int> Main(string[] args)
         {
             var json = File.ReadAllText(SETTINGS_FILE);
 
-            var settings = JsonSerializer.Deserialize<Settings>(json, JsonOptions);
+            var settings = JsonSerializer.Deserialize<Settings>(json, SerializerOptionsA);
 
             if (settings == null)
             {
@@ -52,84 +78,117 @@ namespace Lab2Gpx
 
             var login = await Login(http, settings);
 
+
+
             if (login)
             {
-                Console.WriteLine("Vyber možnost:");
-                Console.WriteLine("1 - Vyhledat");
-                Console.WriteLine("2 - Stáhnout");
-
-                var choice = Console.ReadLine();
-
-                if (choice == "1")
+                do
                 {
-                    var adventures = await SearchLabs(http, settings);
+                    Console.WriteLine();
+                    Console.WriteLine("   Vyber možnost:  ");
+                    Console.WriteLine("-------------------");
+                    Console.WriteLine("| 0 - Exit        |");
+                    Console.WriteLine("| 1 - Vyhledat    |");
+                    Console.WriteLine("| 2 - Stáhnout    |");
+                    Console.WriteLine("| 3 - Stáhnout V2 |");
+                    Console.WriteLine("| 4 - Nastavení   |");
+                    Console.WriteLine("-------------------");
 
-                    var options = new JsonSerializerOptions
+                    Console.Write($"\n #{_step++} > ");
+
+                    var choice = Console.ReadLine();
+
+                    Console.WriteLine();
+
+                    if (choice == "0")
                     {
-                        WriteIndented = true,
-                        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
-                    };
-
-                    string outJson = JsonSerializer.Serialize(adventures, options);
-                    File.WriteAllText("adventures.json", outJson);
-                }
-                else if (choice == "2")
-                {
-                    string inJson = File.ReadAllText("adventures.json");
-
-                    var option = new JsonSerializerOptions
+                        break;
+                    }
+                    if (choice == "1")
                     {
-                        PropertyNameCaseInsensitive = true,
-                        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
-                    };
+                        var adventures = await SearchLabs(http, settings);
 
-                    var adventures = JsonSerializer.Deserialize<AdventureSummary[]>(inJson, option);
-
-                    if (adventures != null)
-                    {
-                        var details = new List<AdventureDetail>();
-
-                        foreach (var adventure in adventures)
+                        foreach (var x in adventures ?? [])
                         {
-                            Console.WriteLine(adventure.Title);
-
-                            var adventureLab = await DownloadLab(http, adventure);
-
-                            details.Add(adventureLab);
-
+                            Console.WriteLine($"{x.Title}");
                         }
 
-                        var gpx = CreateGpx(http, details, settings);
+                        string outJson = JsonSerializer.Serialize(adventures, SerializerOptionsB);
+                        File.WriteAllText("adventures.json", outJson);
+                    }
+                    else if (choice == "2")
+                    {
+                        string inJson = File.ReadAllText("adventures.json");
 
-                        try
+                        var adventures = JsonSerializer.Deserialize<AdventureSummary[]>(inJson, SerializerOptionsB);
+
+                        if (adventures != null)
                         {
-                            var options = new JsonSerializerOptions
+                            var details = new List<AdventureDetail>();
+
+                            foreach (var adventure in adventures)
                             {
-                                WriteIndented = true,
-                                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
-                            };
+                                Console.WriteLine(adventure.Title);
 
-                            string outJson = JsonSerializer.Serialize(details, options);
-                            File.WriteAllText("adventuresX.json", outJson);
+                                var adventureLab = await DownloadLab(http, adventure);
+
+                                details.Add(adventureLab);
+
+                            }
+
+                            var gpx = GpxGenerator.CreateGpx(http, details, settings);
+
+                            try
+                            {
+                                string outJson = JsonSerializer.Serialize(details, SerializerOptionsB);
+                                File.WriteAllText("adventuresX.json", outJson);
 
 
-                            var htmlContent = AdventureHtmlGenerator.Generate(details.First());
+                                var htmlContent = HtmlGenerator.Generate(details.First());
 
-                            await File.WriteAllTextAsync("index.html", htmlContent, Encoding.UTF8);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine(ex.Message);
+                                await File.WriteAllTextAsync("index.html", htmlContent, Encoding.UTF8);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex.Message);
+                            }
                         }
                     }
-                }
-                else
-                {
-                    //
-                }
+                    else if (choice == "3")
+                    {
+                        string inJson = File.ReadAllText("adventures.json");
+
+                        var adventures = JsonSerializer.Deserialize<AdventureSummary[]>(inJson, SerializerOptionsB);
+
+                        if (adventures != null)
+                        {
+                            var details = new List<AdventureDetailV2>();
+
+                            foreach (var adventure in adventures)
+                            {
+                                Console.WriteLine(adventure.Title);
+
+                                var adventureLab = await DownloadLabV2(http, adventure);
+
+                                details.Add(adventureLab);
+
+                                await DownloadLabImages(http, adventureLab);
+                            }
+
+                            try
+                            {
+                                string outJson = JsonSerializer.Serialize(details, SerializerOptionsB);
+                                File.WriteAllText("adventuresV2.json", outJson);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex.Message);
+                            }
+                        }
+                    }
 
 
-
+                } while (true);
 
                 return 0;
             }
@@ -150,28 +209,36 @@ namespace Lab2Gpx
 
             try
             {
-                Console.WriteLine($"\nLoging {settings.UserName} in to the server");
+                Console.WriteLine($"Loging {settings.UserName} in to the server...\n");
 
-                var loginBody = JsonSerializer.Serialize(new { Username = settings.UserName, Password = settings.UserPassword });
-
-                var loginResp = await http.PostAsync(LOGIN_URL, new StringContent(loginBody, Encoding.UTF8, "application/json"));
-
-                var loginContent = await loginResp.Content.ReadAsStringAsync();
-
-                if (!loginResp.IsSuccessStatusCode)
+                var body = JsonSerializer.Serialize(new
                 {
-                    Console.WriteLine($"Login failed {loginResp.StatusCode}:{loginResp.ReasonPhrase}:{loginContent}");
+                    Username = settings.UserName,
+                    Password = settings.UserPassword
+                });
+
+                var response = await http.PostAsync(LOGIN_URL, new StringContent(body, Encoding.UTF8, "application/json"));
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    await ProcessingFailedRequest("Login", response);
                 }
                 else
                 {
-                    var loginData = JsonSerializer.Deserialize<LoginResponse>(loginContent, JsonOptions);
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    var loginData = JsonSerializer.Deserialize<LoginResponse>(content, SerializerOptionsA);
 
                     if (loginData == null)
                     {
-                        throw new Exception($"Failed to deserialize response: {loginContent}");
+                        throw new Exception($"Login failed to deserialize response: {content}");
                     }
 
                     http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", loginData.AccessToken);
+
+                    AccesToken = loginData.AccessToken;
+
+                    File.WriteAllText("token.txt", AccesToken);
 
                     Console.WriteLine("Login OK");
 
@@ -199,9 +266,9 @@ namespace Lab2Gpx
 
             try
             {
-                Console.WriteLine($"\nSearching Adventure Labs (lat={settings.Latitude}, lon={settings.Longitude}, radius={settings.Radius}m, limit={settings.Limit})...");
+                Console.WriteLine($"Searching Adventure Labs on (lat={settings.Latitude}, lon={settings.Longitude}, radius={settings.Radius}m, limit={settings.Limit})...\n");
 
-                var searchBody = JsonSerializer.Serialize(new
+                var body = JsonSerializer.Serialize(new
                 {
                     Origin = new { Latitude = settings.Latitude, Longitude = settings.Longitude },
                     RadiusInMeters = settings.Radius,
@@ -215,26 +282,26 @@ namespace Lab2Gpx
                     ExcludeOwned = false
                 });
 
-                var searchResp = await http.PostAsync(SEARCH_URL, new StringContent(searchBody, Encoding.UTF8, "application/json"));
+                var response = await http.PostAsync(SEARCH_URL, new StringContent(body, Encoding.UTF8, "application/json"));
 
-                var searchContent = await searchResp.Content.ReadAsStringAsync();
-
-                if (!searchResp.IsSuccessStatusCode)
+                if (!response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine($"Searching failed: {searchResp.StatusCode}:{searchResp.ReasonPhrase}:{searchContent}");
+                    await ProcessingFailedRequest("Search", response);
                 }
                 else
                 {
-                    var searchData = JsonSerializer.Deserialize<SearchResponse>(searchContent, JsonOptions);
+                    var content = await response.Content.ReadAsStringAsync();
 
-                    if (searchData == null)
+                    var data = JsonSerializer.Deserialize<SearchResponse>(content, SerializerOptionsA);
+
+                    if (data == null)
                     {
-                        throw new Exception($"Failed to deserialize response: {searchContent}");
+                        throw new Exception($"Failed to deserialize response: {content}");
                     }
 
-                    result = searchData?.Items ?? [];
+                    result = data?.Items ?? [];
 
-                    Console.WriteLine($"Searching {searchData?.TotalCount} Labs OK");
+                    Console.WriteLine($"Found {data?.TotalCount} Adventure Lab - OK");
                 }
             }
             catch (Exception ex)
@@ -260,25 +327,24 @@ namespace Lab2Gpx
             {
                 await Task.Delay(300);
 
-                var detailResp = await http.GetAsync(DETAILS_URL + adventureSummary.AdventureGuid ?? "");
+                var response = await http.GetAsync(DETAILS_URL + adventureSummary.AdventureGuid ?? "");
 
-                var detailContent = await detailResp.Content.ReadAsStringAsync();
-
-                if (!detailResp.IsSuccessStatusCode)
+                if (!response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine($"Load {adventureSummary.Title} detail failed: {detailResp.StatusCode}:{detailResp.ReasonPhrase}:{detailContent}");
+                    await ProcessingFailedRequest($"Download {adventureSummary.Title}", response);
                 }
                 else
                 {
-                    var detailData = JsonSerializer.Deserialize<AdventureDetail>(detailContent, JsonOptions);
+                    var content = await response.Content.ReadAsStringAsync();
 
-                    if (detailData == null)
+                    var data = JsonSerializer.Deserialize<AdventureDetail>(content, SerializerOptionsA);
+
+                    if (data == null)
                     {
-                        throw new Exception($"Failed to deserialize response: {detailContent}");
+                        throw new Exception($"Failed to deserialize response: {content}");
                     }
 
-                    result = detailData;
-
+                    result = data;
                 }
             }
             catch (Exception ex)
@@ -289,80 +355,148 @@ namespace Lab2Gpx
             return result;
         }
 
-        internal static bool CreateGpx(HttpClient http, IEnumerable<AdventureDetail> allLabs, Settings settings)
+        /// <summary>
+        /// Stáhne detail Adventure Lab z labs-api.geocaching.com a uloží výsledky do adventures2.json
+        /// </summary>
+        internal static async Task<AdventureDetailV2> DownloadLabV2(HttpClient http, AdventureSummary adventure)
         {
-            bool result = false;
+            AdventureDetailV2? result = null;
 
             try
             {
-                Console.WriteLine("\nGenerating GPX...");
+                await Task.Delay(300);
 
-                XNamespace gpxNs = "http://www.topografix.com/GPX/1/0";
-                XNamespace gsNs = "http://www.groundspeak.com/cache/1/0/1";
+                var response = await http.GetAsync(LABS_API_DETAILS_URL + adventure.AdventureGuid);
 
-                var root = new XElement(gpxNs + "gpx",
-                    new XAttribute("version", "1.0"),
-                    new XAttribute("creator", "Lab2Gpx C#"),
-                    new XAttribute(XNamespace.Xmlns + "groundspeak", gsNs),
-                    new XAttribute("xmlns", gpxNs)
-                );
-
-                foreach (var adv in allLabs ?? [])
+                if (!response.IsSuccessStatusCode)
                 {
-                    try
-                    {
-                        string shortId = (adv.AdventureGuid ?? "").Replace("-", "")[..8].ToUpper();
-
-                        // Hlavni waypoint
-                        root.Add(Helpers.MakeWpt(gpxNs, gsNs,
-                            id: "AL" + shortId,
-                            name: adv.Title ?? adv.Title ?? "?",
-                            lat: adv.Location?.Latitude ?? adv.Location?.Latitude ?? 0,
-                            lon: adv.Location?.Longitude ?? adv.Location?.Longitude ?? 0,
-                            desc: Helpers.Strip(adv.Description ?? ""),
-                           // owner: detail.Owner?.Name ?? "",
-                           owner: adv.OwnerUsername ?? "",
-                            extra: $"Adventure Lab, {adv.StageSummaries?.Count ?? 0} zastavek"
-                        ));
-
-                        // Stage waypointy
-                        int stageNum = 1;
-                        foreach (var stage in adv.StageSummaries ?? new List<StageSummary>())
-                        {
-                            string stageDesc = Helpers.Strip(stage.Description ?? "");
-                            if (!string.IsNullOrEmpty(stage.Question))
-                                stageDesc += $"\n\nOtazka: {Helpers.Strip(stage.Question)}";
-
-                            root.Add(Helpers.MakeWpt(gpxNs, gsNs,
-                                id: $"AL{shortId}{stageNum:D2}",
-                                name: $"{adv.Title} - {stageNum}/{adv.StageSummaries!.Count}: {stage.Title ?? "Stage " + stageNum}",
-                                lat: stage.Location?.Latitude ?? 0,
-                                lon: stage.Location?.Longitude ?? 0,
-                                desc: stageDesc,
-                                owner: adv.OwnerUsername ?? "",
-                                extra: ""
-                            ));
-                            stageNum++;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new Exception($"{adv.Title}", ex.InnerException);
-                    }
+                    await ProcessingFailedRequest("DownloadV2", response);
                 }
+                else
+                {
+                    var content = await response.Content.ReadAsStringAsync();
 
-                new XDocument(new XDeclaration("1.0", "utf-8", "yes"), root).Save(settings.OutputFileName);
-                Console.WriteLine($"\nHotovo! Ulozeno: {Path.GetFullPath(settings.OutputFileName)}");
+                    var data = JsonSerializer.Deserialize<AdventureDetailV2>(content, SerializerOptionsA);
 
-                result = true;
+                    if (data == null)
+                    {
+                        throw new Exception($"Failed to deserialize response: {content}");
+                    }
+
+                    result = data;
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error {nameof(CreateGpx)} {ex.Message}:{ex.Data}:{ex.StackTrace}");
+                Console.WriteLine($"Error {nameof(DownloadLab)} {adventure.Title}: {ex.Message}:{ex.Data}:{ex.StackTrace}");
             }
 
             return result;
         }
-    }
 
+        internal static async Task DownloadLabImages(HttpClient http, AdventureDetailV2 detail)
+        {
+            if (detail?.Title == null) return;
+
+            // Vytvoř bezpečný název složky z titulu
+            string folderName = string.Concat(detail.Title.Split(Path.GetInvalidFileNameChars()));
+            Directory.CreateDirectory(folderName);
+
+            // Stáhni hlavní obrázek labky
+            if (!string.IsNullOrEmpty(detail.KeyImageUrl))
+            {
+                await DownloadImage(http, detail.KeyImageUrl, Path.Combine(folderName, "cover.jpg"));
+            }
+
+            // Stáhni obrázky jednotlivých stagí
+            if (detail.GeocacheSummaries != null)
+            {
+                foreach (var stage in detail.GeocacheSummaries)
+                {
+                    //Key
+                    if (string.IsNullOrEmpty(stage.KeyImageUrl) || string.IsNullOrEmpty(stage.Id))
+                        continue;
+
+                    string fileName = $"{"K_"}{stage.Title ?? stage.Id}.jpg";
+                    string safeFileName = string.Concat(fileName.Split(Path.GetInvalidFileNameChars()));
+
+                    await DownloadImage(http, stage.KeyImageUrl, Path.Combine(folderName, safeFileName));
+
+                    //Award
+                    if (string.IsNullOrEmpty(stage.AwardImageUrl) || string.IsNullOrEmpty(stage.Id))
+                        continue;
+
+                    string fileNameA = $"{"A_"}{stage.Title ?? stage.Id}.jpg";
+                    string safeFileNamA = string.Concat(fileNameA.Split(Path.GetInvalidFileNameChars()));
+
+                    await DownloadImage(http, stage.AwardImageUrl, Path.Combine(folderName, safeFileNamA));
+
+                }
+            }
+        }
+
+        internal static async Task DownloadImage(HttpClient http, string url, string filePath)
+        {
+            try
+            {
+                await Task.Delay(300);
+
+                var savedHeader = http.DefaultRequestHeaders.Authorization;
+
+                // Dočasně odstraňit Authorization header - Azure Blob ho odmítá
+                http.DefaultRequestHeaders.Authorization = null;
+
+                var response = await http.GetAsync(url);
+
+                http.DefaultRequestHeaders.Authorization = savedHeader;
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    await ProcessingFailedRequest("Download Image", response);
+                }
+                else
+                {
+                    var data = await response.Content.ReadAsByteArrayAsync();
+
+                    await File.WriteAllBytesAsync(filePath, data);
+
+                    Console.WriteLine($"  Uloženo: {filePath}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error {nameof(DownloadImage)} {url}: {ex.Message}");
+            }
+        }
+
+        internal static async Task ProcessingFailedRequest(string name, HttpResponseMessage response)
+        {
+            Console.WriteLine($"{name} failed: {(int)response.StatusCode} {response.ReasonPhrase}\n");
+            Console.WriteLine($"{name} url: {response.RequestMessage?.RequestUri}\n");
+
+            var b = response?.RequestMessage?.Content;
+            if (b != null)
+            {
+                var body = await b.ReadAsStringAsync();
+                Console.WriteLine($"{name} body: {body}\n");
+            }
+
+            var c = response?.Content;
+            if (c != null)
+            {
+                if (c?.Headers?.ContentType?.MediaType == "application/json")
+                {
+                    var content = await c.ReadAsStringAsync();
+                    Console.WriteLine($"{name} response: {content}\n");
+                }
+                else 
+                {     
+                    Console.WriteLine($"{name} response: -");
+                }
+
+            }
+
+        }
+
+    }
 }

@@ -96,13 +96,13 @@ namespace Lab2Gpx
             [property: JsonPropertyName("keyImageUrl")] string? KeyImageUrl,
             [property: JsonPropertyName("findCodeHashBase16v2")] string? FindCodeHashBase16v2,
             [property: JsonPropertyName("answerCodeHashesBase16v2")] List<string>? AnswerCodeHashesBase16v2,
-            [property: JsonPropertyName("isComplete")] bool IsComplete,
+            [property: JsonPropertyName("isComplete")] bool? IsComplete,
             [property: JsonPropertyName("description")] string? Description,
             [property: JsonPropertyName("location")] Location? Location,
             [property: JsonPropertyName("geofencingRadius")] int GeofencingRadius,
             [property: JsonPropertyName("challengeType")] string? ChallengeType,
             [property: JsonPropertyName("question")] string? Question,
-            [property: JsonPropertyName("isFinal")] bool IsFinal
+            [property: JsonPropertyName("isFinal")] bool? IsFinal
             );
 
         internal record AdventureCredit(
@@ -112,5 +112,73 @@ namespace Lab2Gpx
             [property: JsonPropertyName("feeAllowed")] bool FeeAllowed,
             [property: JsonPropertyName("hyperlinksAllowed")] bool HyperlinksAllowed
             );
+
+        internal record AdventureDetailV2(
+    [property: JsonPropertyName("Id")] string? Id,
+    [property: JsonPropertyName("Title")] string? Title,
+    [property: JsonPropertyName("Description")] string? Description,
+    [property: JsonPropertyName("Visibility")] int? Visibility,
+    [property: JsonPropertyName("IsPublic")] bool? IsPublic,
+    [property: JsonPropertyName("PublishedUtc")] DateTime? PublishedUtc,
+    [property: JsonPropertyName("CompletedGeocachesCount")] int? CompletedGeocachesCount,
+    [property: JsonPropertyName("TotalGeocachesCount")] int? TotalGeocachesCount,
+    [property: JsonPropertyName("StagesTotalCount")] int? StagesTotalCount,
+    [property: JsonPropertyName("KeyImageUrl")] string? KeyImageUrl,
+    [property: JsonPropertyName("Location")] LocationV2? Location,
+    [property: JsonPropertyName("IsComplete")] bool? IsComplete,
+    [property: JsonPropertyName("IsTest")] bool? IsTest,
+    [property: JsonPropertyName("SmartLinkString")] string? SmartLinkString,
+    [property: JsonPropertyName("DeepLink")] string? DeepLink,
+    [property: JsonPropertyName("FirebaseDynamicLink")] string? FirebaseDynamicLink,
+    [property: JsonPropertyName("ClonedSourceAdventureId")] string? ClonedSourceAdventureId,
+    [property: JsonPropertyName("TestAdventureId")] string? TestAdventureId,
+    [property: JsonPropertyName("LastUpdateDateTimeUtc")] DateTime? LastUpdateDateTimeUtc,
+    [property: JsonPropertyName("AwardVideoYouTubeId")] string? AwardVideoYouTubeId,
+    [property: JsonPropertyName("AwardMessage")] string? AwardMessage,
+    [property: JsonPropertyName("GeocacheSummaries")] List<GeocacheSummaryV2>? GeocacheSummaries,
+    [property: JsonPropertyName("OwnerUsername")] string? OwnerUsername,
+    [property: JsonPropertyName("OwnerId")] string? OwnerId,
+    [property: JsonPropertyName("AwardImageAsBase64String")] string? AwardImageAsBase64String,
+    [property: JsonPropertyName("KeyImageAsBase64String")] string? KeyImageAsBase64String,
+    [property: JsonPropertyName("IsLinear")] bool? IsLinear,
+    [property: JsonPropertyName("AdventureType")] int? AdventureType,
+    [property: JsonPropertyName("RatingsAverage")] double? RatingsAverage,
+    [property: JsonPropertyName("RatingsTotalCount")] int? RatingsTotalCount,
+    [property: JsonPropertyName("MedianTimeToComplete")] int? MedianTimeToComplete,
+    [property: JsonPropertyName("ReviewsTotalCount")] int? ReviewsTotalCount,
+    [property: JsonPropertyName("AdventureThemes")] List<string>? AdventureThemes
+);
+
+        internal record LocationV2(
+            [property: JsonPropertyName("Latitude")] double Latitude,
+            [property: JsonPropertyName("Longitude")] double Longitude,
+            [property: JsonPropertyName("Altitude")] double? Altitude
+        );
+
+        internal record GeocacheSummaryV2(
+            [property: JsonPropertyName("Id")] string? Id,
+            [property: JsonPropertyName("Title")] string? Title,
+            [property: JsonPropertyName("KeyImageUrl")] string? KeyImageUrl,
+            [property: JsonPropertyName("FindCodeHashBase16")] string? FindCodeHashBase16,
+            [property: JsonPropertyName("FindCodeHashBase16v2")] string? FindCodeHashBase16v2,
+            [property: JsonPropertyName("IsComplete")] bool? IsComplete,
+            [property: JsonPropertyName("AwardImageUrl")] string? AwardImageUrl,
+            [property: JsonPropertyName("AwardVideoYouTubeId")] string? AwardVideoYouTubeId,
+            [property: JsonPropertyName("CompletionAwardMessage")] string? CompletionAwardMessage,
+            [property: JsonPropertyName("Description")] string? Description,
+            [property: JsonPropertyName("Location")] LocationV2? Location,
+            [property: JsonPropertyName("GeofencingRadius")] double? GeofencingRadius,
+            [property: JsonPropertyName("ChallengeType")] int? ChallengeType,
+            [property: JsonPropertyName("Question")] string? Question,
+            [property: JsonPropertyName("CompletionCode")] string? CompletionCode,
+            [property: JsonPropertyName("MultiChoiceOptions")] object? MultiChoiceOptions,
+            [property: JsonPropertyName("IsFinal")] bool? IsFinal,
+            [property: JsonPropertyName("UnlockingStages")] object? UnlockingStages,
+            [property: JsonPropertyName("LastUpdateDateTimeUtc")] DateTime? LastUpdateDateTimeUtc,
+            [property: JsonPropertyName("DescriptionVideoYouTubeId")] string? DescriptionVideoYouTubeId,
+            [property: JsonPropertyName("AwardImageAsBase64String")] string? AwardImageAsBase64String,
+            [property: JsonPropertyName("KeyImageAsBase64String")] string? KeyImageAsBase64String,
+            [property: JsonPropertyName("DeleteAwardImage")] bool? DeleteAwardImage
+        );
     }
 }
